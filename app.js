@@ -36,17 +36,13 @@ app.get("/api", (req, res) => {
 app.get("/api/v1/covid", (req, res) => {
   try {
     const { date } = req.query;
-    let data;
     connection.query(
       `SELECT * from covid_countries cc 
             WHERE day= ${date}'
             ORDER BY cases DESC
             LIMIT 10`,
       (err, results, fields) => {
-         res.status(200).json({
-          status: "success",
-          data:results
-        });
+        res.send(results)
       }
     );
 
