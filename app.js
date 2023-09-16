@@ -33,22 +33,33 @@ app.get("/api", (req, res) => {
   res.send("Hello World");
 });
 
-app.get("/api/v1/covid", (req, res) => {
-  try {
-    const { date } = req.query;
-    connection.query(
-      `SELECT * from covid_countries cc 
-            WHERE day= ${date}'
-            ORDER BY cases DESC
-            LIMIT 10`,
-      (err, results, fields) => {
-        res.send(results)
-      }
-    );
+app.get("/api/v1/covid", async (req, res) => {
+  const { date } = req.query;
+  // Ensure the 'date' parameter is properly formatted and not empty
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    res.status(400).send("Invalid date format");
+    return;
+  }
 
-    
-  } catch (error) {}
+  connection.query(
+    `SELECT * FROM covid_countries 
+     WHERE day = ?
+     ORDER BY cases DESC
+     LIMIT 10`,
+    [date],
+    function (err, results, fields) {
+      if (err) {
+        console.error("Error querying the database:", err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+
+      console.log(results);
+      res.status(200).json({
+        data: results,
+      });
+    }
+  );
 });
 
-connection.end();
 module.exports = app;
