@@ -43,14 +43,14 @@ app.get("/api/v1/covid", (req, res) => {
             ORDER BY cases DESC
             LIMIT 10`,
       (err, results, fields) => {
-        data = results;
+         res.status(200).json({
+          status: "success",
+          data:results
+        });
       }
     );
 
-    return res.status(200).json({
-      status: "success",
-      data,
-    });
+    
   } catch (error) {}
 });
 
